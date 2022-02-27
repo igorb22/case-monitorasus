@@ -1,0 +1,42 @@
+name: ASP.NET CORE CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1
+      
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: ./MonitoraSUS
+
+    - name: Build
+      run: dotnet build --no-restore
+      working-directory: ./MonitoraSUS
+      
+    - name: Publish
+      run:  dotnet publish ./MonitoraSUS/MonitoraSUS.sln --configuration Release --no-restore --output ./publish 
+      
+    - name: Upload via FTP
+      uses: SamKirkland/FTP-Deploy-Action@4.3.0
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USER }}
+        password: ${{ secrets.FTP_PASS }}
+        local-dir: publish/
+        remote-dir: ./
+        exclude: |
+          **/.git*
+          **/.git*/**
