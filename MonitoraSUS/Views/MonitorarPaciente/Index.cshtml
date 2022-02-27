@@ -1,0 +1,321 @@
+﻿@model Model.ViewModel.PesquisaPacienteViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col-md-12">
+			<div class="card card-content">
+				<div class="card-header bg-transparent">
+					<div class="row align-items-center">
+
+						<div class="col">
+							<h5 class="card-title text-muted mb-0">MonitoraSUS</h5>
+							<h5 class="h3 mb-0">Monitoramento de Pacientes</h5>
+						</div>
+						<div class="col text-right">
+							<!--a class="btn btn-success" asp-action="Create">Novo Exame</!--a-->
+							<a class="btn btn-default" asp-controller="Home" asp-action="Index"> <i class="fas fa-arrow-left"></i> Voltar</a><br />
+						</div>
+					</div>
+				</div>
+				<div class="card-body">
+					<h4 class="card-title text-muted mb-0">Filtre Pacientes</h4>
+					<div class="pl-lg-0">
+						<div class="row">
+							<div class="col">
+								<form asp-action="Index">
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label class="form-control-label" for="input-cpf">CPF/RG ou NOME</label>
+												<input asp-for="Pesquisa" type="text" name="Pesquisa" class="form-control" placeholder="" />
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="form-control-label" for="data-inicial"> Data Inicial</label>
+												<input asp-for="DataInicial" type="date" id="data-inicial" name="DataInicial" class="form-control" />
+											</div>
+										</div>
+										<div class="col-md-3">
+											<div class="form-group">
+												<label class="form-control-label" for="data-final"> Data Final</label>
+												<input asp-for="DataFinal" type="date" id="data-final" name="DataFinal" class="form-control" />
+											</div>
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label class="form-control-label" for="input-virus-bacteria">Exame</label>
+												@Html.DropDownListFor(model => model.VirusBacteria, ViewBag.VirusBacteria as SelectList, new
+												{ @class = "form-control", @id = "input-virus-bacteria", @name = "VirusBacteria" })
+											</div>
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-lg-6">
+											<div class="form-group">
+												<label class="form-control-label" for="input-atuacao-estado">Situacao</label>
+												<select asp-for="Resultado" name="Resultado" class="form-control" id="input-resultado">
+													<option>Todas as Opçoes</option>
+													<option>Positivo</option>
+													<option>Indeterminado</option>
+													<option>Recuperado</option>
+													<option>IgG/IgM Positivo</option>
+													<option>Aguardando</option>
+												</select>
+											</div>
+										</div>
+									</div>
+
+									<div class="col-md-0">
+										<div class="row">
+											<div class="col-md-3">
+												<div class="form-group">
+													<button type="submit" id="btn-filtar" class="form-control btn btn-default"><i class="fa fa-search"></i> Filtrar</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+							<div class="col-md-4 text-center">
+								<div class="table-responsive">
+									<table class="table align-items-center table-flush">
+										<thead class="thead-light">
+											<tr>
+												<th scope="col" class="sort" data-sort="resultado">
+													PACIENTES
+												</th>
+												<th scope="col" class="sort" data-sort="total">
+													Total
+												</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="text-danger">
+												<td>
+													Positivos
+												</td>
+												<td>
+													@Model.Positivos
+												</td>
+											</tr>
+											<tr class="text-danger">
+												<td>
+													IgG/IgM Positivos
+												</td>
+												<td>
+													@Model.IgGIgM
+												</td>
+											</tr>
+											<tr class="text-warning">
+												<td>
+													Indeterminados
+												</td>
+												<td>
+													@Model.Indeterminados
+												</td>
+											</tr>
+											<tr class="text-blue">
+												<td>
+													Recuperados
+												</td>
+												<td>
+													@Model.Recuperados
+												</td>
+											</tr>
+											<tr class="text-success">
+												<td>
+													Aguardando Resultado
+												</td>
+												<td>
+													@Model.Aguardando
+												</td>
+											</tr>
+										</tbody>
+									</table>
+									<table class="table align-items-center table-flush">
+										<thead class="thead-light">
+											<tr>
+												<th scope="col" class="sort" data-sort="resultado">
+													Situação Paciente
+												</th>
+												<th scope="col" class="sort" data-sort="total">
+													Total
+												</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr class="text-danger">
+												<td>
+													UTI
+												</td>
+												<td>
+													@Model.UTI
+												</td>
+											</tr>
+											<tr class="text-warning">
+												<td>
+													Estabilização
+												</td>
+												<td>
+													@Model.Estabilizacao
+												</td>
+											</tr>
+											<tr class="text-warning">
+												<td>
+													Internamento Clinico
+												</td>
+												<td>
+													@Model.Hospitalizado
+												</td>
+											</tr>
+											<tr class="text-blue">
+												<td>
+													Isolamento
+												</td>
+												<td>
+													@Model.Isolamento
+												</td>
+											</tr>
+											<tr class="text-blue">
+												<td>
+													Recuperados
+												</td>
+												<td>
+													@Model.Saudavel
+												</td>
+											</tr>
+											<tr class="text-blue">
+												<td>
+													Óbitos
+												</td>
+												<td>
+													@Model.Obito
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+				<div class="col-md-12 text-right">
+					@using (Html.BeginForm("Export", "Exame", FormMethod.Post))
+					{
+						@for (int i = 0; i < Model.Exames.Count; i++)
+						{
+							<div class="form-group" hidden>
+								<div class="col-md-10">
+									@Html.EditorFor(model => Model.Exames[i].IdExame , new { htmlAttribu5tes = new { @class = "form-control" } })
+								</div>
+							</div>
+						}
+						<button type="submit" class="btn btn-success btn-xs"><i class="fa fa-list"></i> Exportar Planilha</button>
+					}
+				</div>
+				<div class="card-body">
+					<div class="table-responsive">
+						<table class="table table-custom align-items-center table-flush">
+							<thead class="thead-light">
+								<tr>
+									<th scope="col" class="sort w10" data-sort="cpf">
+										CPF/RG
+									</th>
+									<th scope="col" class="sort w26" data-sort="nome">
+										Nome
+									</th>
+									<th scope="col" class="sort w5" data-sort="data-exame">
+										Data <br> Exame
+									</th>
+									<th scope="col" class="sort w5 text-center" data-sort="ultima-situacao">
+										Resultado
+									</th>
+									<th scope="col" class="sort w10 text-center" data-sort="data-monitoramento">
+										Situação <br> Paciente
+									</th>
+									<th scope="col" class="sort w7 text-center" data-sort="data-monitoramento">
+										Último <br> Monitoramento
+									</th>
+									<th scope="col" class="sort w20" data-sort="nome">
+										Responsável <br> Monitoramento
+									</th>
+									<th class="w10">
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var item in Model.Exames)
+						{
+									<tr>
+										<td>
+											<a href="#">@Html.DisplayFor(modelItem => item.Paciente.Cpf)</a>
+										</td>
+										<td>
+											@Html.DisplayFor(modelItem => item.Paciente.Nome)
+										</td>
+										<th>
+											@Html.DisplayFor(modelItem => item.DataExame)
+										</th>
+										<td class="text-center">
+											@Html.DisplayFor(modelItem => item.UltimoResultado)
+										</td>
+										<td class="text-center">
+											@Html.DisplayFor(modelItem => item.Paciente.SituacaoSaudeDescricao)
+										</td>
+										<td class="text-center">
+											@if (item.DataUltimoMonitoramento.HasValue)
+											{
+												<div>@item.DataUltimoMonitoramento.Value.ToString("dd/MM/yyyy")</div>
+											}
+											else
+											{
+												@: -
+											}
+										</td>
+										<th>
+											@Html.DisplayFor(modelItem => item.Gestor.Nome)
+										</th>
+										<td>
+											<a href="@Url.Action("Edit", "MonitorarPaciente", new { idPaciente = item.Paciente.Idpessoa, IdVirusBacteria = item.VirusBacteria.IdVirusBacteria })" class="btn btn-info btn-sm"><i class="fa fa-edit"></i> Monitorar </a>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["mensagemAviso"] != null)
+{
+    <div id="mensagem-retorno" onclick="swtAlertRedirectIndex('warning','Aviso', '@TempData["mensagemAviso"]','/Home/Index')"></div>
+}
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            if (document.querySelector('#mensagem-retorno'))
+                document.getElementById("mensagem-retorno").click();
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    <script src="~/assets/js/sweet-alert.js"></script>
+
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

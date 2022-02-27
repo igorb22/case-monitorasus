@@ -1,0 +1,343 @@
+﻿@model Model.ViewModel.PessoaViewModel
+@using System.Collections.Generic
+
+@{
+    ViewData["Title"] = "Create";
+
+    var typeCad = ViewBag.userType == 1 ? "Gestor de Saúde" : "Responsável pela Notificação de Exames";
+    var perguntaVinculo = ViewBag.userType == 1 ? "Qual estado/município você é gestor de saúde?" : "Em qual estado/município irá notificar resultados de exames?";
+    var caseController = ViewBag.userType == 1 ? "CreateGestor" : "CreateAgente";
+    var listaDeEstados = ViewBag.estados as List<Model.PessoaModel>;
+    var googleKey = ViewBag.googleKey;
+    var recaptchaSiteKey = ViewBag.recaptchaSiteKey;
+}
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-content">
+                <div class="card-header bg-transparent">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="text-uppercase text-muted ls-1 mb-1">MonitoraSUS</h6>
+                            <h5 class="h3 mb-0">Cadastro de @typeCad</h5>
+                        </div>
+                        <a asp-controller="Login" asp-action="Index" class="btn btn-sm btn-default">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form asp-controller="AgenteSecretario" asp-action="@caseController" autocomplete="off">
+                        <h6 class="heading-small text-muted mb-4">Dados Pessoais</h6>
+                        <div class="pl-lg-4">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-cpf">CPF</label>
+                                        <input asp-for="Cpf" id="input-cpf" placeholder="000.000.000-00" type="text" class="form-control" onfocus="loadEstados()" />
+                                        <span asp-validation-for="Cpf" class="text-danger"></span>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-nome">Nome</label>
+                                        <input type="search" id="input-nome" asp-for="Pessoa.Nome" class="form-control" placeholder="Nome Completo">
+                                        <span asp-validation-for="Pessoa.Nome" id="error-nome" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for="input-data-nascimento" class="form-control-label">Data de Nascimento</label>
+                                        <input class="form-control" type="text" asp-for="Pessoa.DataNascimento" placeholder="dd-mm-aaaa" id="input-data-nascimento">
+                                        <span asp-validation-for="Pessoa.DataNascimento" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="sexo">Sexo</label><br>
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            @Html.RadioButtonFor(model => Model.Pessoa.Sexo, "M", new { @class = "custom-control-input", @id = "input-sexo-masc", @name = "sexo" })
+                                            <label class="custom-control-label" for="input-sexo-masc">Masculino</label>
+                                        </div>
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            @Html.RadioButtonFor(model => Model.Pessoa.Sexo, "F", new { @class = "custom-control-input", @id = "input-sexo-fem", @name = "sexo" })
+                                            <label class="custom-control-label" for="input-sexo-fem">Feminino</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="my-4" />
+                        <h6 class="heading-small text-muted mb-4">Informações de Contato</h6>
+                        <div class="pl-lg-4">
+                            <div class="row">
+                                <div class="col-lg-12" hidden>
+                                    <div class="form-group">
+                                        <input type="hidden" id="longitude" asp-for="Pessoa.Longitude" />
+                                        <input type="hidden" id="latitude" asp-for="Pessoa.Latitude" />
+                                        <input type="hidden" id="g-recaptcha-response" asp-for="RecaptchaResponse" />
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="postal_code">CEP (Não sabe? </label> <a href="http://www.buscacep.correios.com.br/sistemas/buscacep/" target="_blank">Busque aqui</a>)
+                                        <input asp-for="Pessoa.Cep" name="Pessoa.Cep" oninput="PreencheFormCEP()" id="postal_code" class="form-control" placeholder="CEP">
+                                        <span id="spanInvalidCep" hidden class="text-danger text-center" style="padding: 10px">Cep Invalido!!</span>
+                                        <span asp-validation-for="Pessoa.Cep" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="route">Logradouro</label>
+                                        <input asp-for="Pessoa.Rua" name="Pessoa.Rua" type="search" oninput="PreencheForm()" placeholder="Pesquise pelo CEP, Rua, Bairro, Número" autocomplete="off" id="route" class="form-control">
+                                        <span asp-validation-for="Pessoa.Rua" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-1">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="street_number">Número</label>
+                                        <input asp-for="Pessoa.Numero" name="Pessoa.Numero" id="street_number" class="form-control" placeholder="">
+                                        <span asp-validation-for="Pessoa.Numero" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="sublocality_level_1">Bairro</label>
+                                        <input asp-for="Pessoa.Bairro" name="Pessoa.Bairro" id="sublocality_level_1" class="form-control" placeholder="Bairro">
+                                        <span asp-validation-for="Pessoa.Bairro" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-cidade">Cidade</label>
+                                        <input type="text" readonly id="administrative_area_level_2" class="form-control" asp-for="Pessoa.Cidade" name="Pessoa.Cidade" placeholder="Cidade">
+                                        <span asp-validation-for="Pessoa.Cidade" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-estado">Estado</label>
+                                        <input type="text" readonly id="administrative_area_level_1" class="form-control" asp-for="Pessoa.Estado" name="Pessoa.Estado" placeholder="Estado">
+                                        <span asp-validation-for="Pessoa.Estado" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-complemento">Complemento</label>
+                                        <input type="text" id="input-complemento" class="form-control" asp-for="Pessoa.Complemento" placeholder="Complemento">
+                                        <span asp-validation-for="Pessoa.Complemento" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-celular">Celular</label>
+                                        <input type="text" id="input-celular" class="form-control" asp-for="Pessoa.FoneCelular" placeholder=" (99) 99999 9999">
+                                        <span asp-validation-for="Pessoa.FoneCelular" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-telefone">Telefone</label>
+                                        <input type="text" id="input-telefone" class="form-control" asp-for="Pessoa.FoneFixo" placeholder=" (99) 9999 9999">
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="input-email">E-mail</label>
+                                        <input type="email" id="input-email" class="form-control" autocomplete="off" asp-for="Pessoa.Email" placeholder="email@example.com">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="my-4" />
+                        <h6 class="heading-small text-muted mb-4">Comorbidades</h6>
+                        <div class="pl-lg-4">
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="Hipertenso" asp-for="Pessoa.Hipertenso">
+                                        <label class="custom-control-label" for="Hipertenso">Hipertensão</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="Diabetes" asp-for="Pessoa.Diabetes">
+                                        <label class="custom-control-label" for="Diabetes">Diabetes</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="Obeso" asp-for="Pessoa.Obeso">
+                                        <label class="custom-control-label" for="Obeso">Obeso</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="Cardiopatia" asp-for="Pessoa.Cardiopatia">
+                                        <label class="custom-control-label" for="Cardiopatia">Cardiopatia</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="Imunodeprimido" asp-for="Pessoa.Imunodeprimido">
+                                        <label class="custom-control-label" for="Imunodeprimido">Imunodeprimido</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="Cancer" asp-for="Pessoa.Cancer">
+                                        <label class="custom-control-label" for="Cancer">Câncer</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="DoencaRespiratoria" asp-for="Pessoa.DoencaRespiratoria">
+                                        <label class="custom-control-label" for="DoencaRespiratoria">Doença Respiratória</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="DoencaRenal" asp-for="Pessoa.DoencaRenal">
+                                        <label class="custom-control-label" for="DoencaRenal">Doença Renal</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="Epilepsia" asp-for="Pessoa.Epilepsia">
+                                        <label class="custom-control-label" for="Epilepsia">Epilepsia</label>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <input type="search" id="input-outrasComorbidades" class="form-control" style="margin-top: 1px;" asp-for="Pessoa.OutrasComorbidades" placeholder="Outras comorbidades">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="my-4" />
+                        <h6 class="heading-small text-muted mb-4">@perguntaVinculo</h6>
+                        <div class="pl-lg-4">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="select-atuacao-estado">Estado</label>
+                                        <select class="form-control" id="select-atuacao-estado" asp-for="IdEstado" onchange="cidadeSelect()">
+                                            <option selected>Selecione o estado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="select-atuacao-cidade">Município</label>
+                                        <select class="form-control" id="select-atuacao-cidade" asp-for="IdMunicipio" disabled>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" for="nivel-atuacao">Nível de Atuação:</label><br>
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="input-atuacao-estadual" asp-for="AreaAtuacao" checked value="Estadual" class="custom-control-input">
+                                            <label class="custom-control-label" for="input-atuacao-estadual">Estadual</label>
+                                        </div>
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="input-atuacao-municipal" asp-for="AreaAtuacao" value="Municipal" class="custom-control-input">
+                                            <label class="custom-control-label" for="input-atuacao-municipal">Municipal</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="my-4" />
+                        <div class="row align-items-center">
+                            <div class="col text-right">
+                                <button class="btn btn-success" id="btn-solicitar">Solicitar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade bs-example-modal-sm" id="modal-espera" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="loading-spinner" style="padding: 20pt;text-align: center">
+                <svg id="hourglass" width='64px' height='64px' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="uil-hourglass">
+                    <rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect>
+                    <g>
+                        <path fill="none" stroke="#007282" stroke-width="5" stroke-miterlimit="10" d="M58.4,51.7c-0.9-0.9-1.4-2-1.4-2.3s0.5-0.4,1.4-1.4 C70.8,43.8,79.8,30.5,80,15.5H70H30H20c0.2,15,9.2,28.1,21.6,32.3c0.9,0.9,1.4,1.2,1.4,1.5s-0.5,1.6-1.4,2.5 C29.2,56.1,20.2,69.5,20,85.5h10h40h10C79.8,69.5,70.8,55.9,58.4,51.7z" class="glass"></path>
+                        <clipPath id="uil-hourglass-clip1">
+                            <rect x="15" y="20" width="70" height="25" class="clip">
+                                <animate attributeName="height" from="25" to="0" dur="1s" repeatCount="indefinite" vlaues="25;0;0" keyTimes="0;0.5;1"></animate>
+                                <animate attributeName="y" from="20" to="45" dur="1s" repeatCount="indefinite" vlaues="20;45;45" keyTimes="0;0.5;1"></animate>
+                            </rect>
+                        </clipPath>
+                        <clipPath id="uil-hourglass-clip2">
+                            <rect x="15" y="55" width="70" height="25" class="clip">
+                                <animate attributeName="height" from="0" to="25" dur="1s" repeatCount="indefinite" vlaues="0;25;25" keyTimes="0;0.5;1"></animate>
+                                <animate attributeName="y" from="80" to="55" dur="1s" repeatCount="indefinite" vlaues="80;55;55" keyTimes="0;0.5;1"></animate>
+                            </rect>
+                        </clipPath>
+                        <path d="M29,23c3.1,11.4,11.3,19.5,21,19.5S67.9,34.4,71,23H29z" clip-path="url(#uil-hourglass-clip1)" fill="#ffab00" class="sand"></path>
+                        <path d="M71.6,78c-3-11.6-11.5-20-21.5-20s-18.5,8.4-21.5,20H71.6z" clip-path="url(#uil-hourglass-clip2)" fill="#ffab00" class="sand"></path>
+                        <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="180 50 50" repeatCount="indefinite" dur="1s" values="0 50 50;0 50 50;180 50 50" keyTimes="0;0.7;1"></animateTransform>
+                    </g>
+                </svg>
+
+                <p>Aguarde enquanto envia sua solicitação de cadastro ...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["mensagemSucesso"] != null || TempData["mensagemErro"] != null)
+{
+    <div class="modal fade bs-example-modal-sm" id="modal-mensagem-retorno" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div style="padding: 20pt;text-align: center">
+                    @if (TempData["mensagemSucesso"] != null)
+                    {
+                        <p> @TempData["mensagemSucesso"] </p>
+                        <a asp-action="Index" asp-controller="Login" class="btn btn-success">Ok</a>
+                    }
+                    else
+                    {
+                        <p> @TempData["mensagemErro"] </p>
+                        <!-- data-dismiss="modal" class="btn btn-success">Ok</!--a-->
+                        <a asp-action="Index" asp-controller="Login" class="btn btn-success">Ok</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+<!-- Scripts -->
+
+@section Scripts {
+    <script src="~/assets/js/custom.js"></script>
+    <script src="~/assets/js/PersonalScripts.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=@recaptchaSiteKey"></script>
+    <script>
+        grecaptcha.ready(function () {
+            grecaptcha.execute('@recaptchaSiteKey', { action: 'homepage' }).then(function (token) {
+                console.log(token);
+                document.getElementById('g-recaptcha-response').value = token;
+            });
+        });
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=@googleKey&libraries=places&callback=initAutocomplete&language=pt-BR"
+            async defer></script>
+}

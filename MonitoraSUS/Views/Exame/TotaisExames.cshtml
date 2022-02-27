@@ -1,0 +1,235 @@
+﻿@model Model.ViewModel.TotalTestesGestaoPopulacao
+@using System.Security.Claims;
+@using Model.ViewModel;
+
+
+<div class="container-fluid mt--6">
+    <div class="row">
+        <div class="col-md-12">
+			<div class="card card-content">
+				<div class="card-header bg-transparent">
+					<div class="row align-items-center">
+
+						<div class="col">
+							<h5 class="card-title text-muted mb-0">MonitoraSUS</h5>
+							<h5 class="h3 mb-0">Realizados pela Gestão e População Testada</h5>
+						</div>
+						<div class="col text-right">
+							<a class="btn btn-default" asp-controller="Home" asp-action="Index"> <i class="fas fa-arrow-left"></i> Voltar</a><br />
+						</div>
+					</div>
+				</div>
+
+				<h3 class="card-title text-muted mb-0">Testes Realizados Pela Gestão </h3>
+				<h4 class="card-title text-muted mb-0">Total de Testes: @Model.TotalGestao </h4>
+
+				<div class="card-body ">
+					<div class="table-responsive">
+						<table class="table align-items-center table-flush">
+							<thead class="thead-light">
+								<tr>
+									<th scope="col" class="sort" data-sort="estado">
+										Estado
+									</th>
+									<th scope="col" class="sort" data-sort="minicipio">
+										Município
+									</th>
+									<th scope="col" class="sort" data-sort="bairro">
+										Bairro
+									</th>
+									<th scope="col" class="sort" data-sort="positivo">
+										Positivos
+									</th>
+									<th scope="col" class="sort" data-sort="positivo">
+										Negativos
+									</th>
+									<th scope="col" class="sort" data-sort="positivo">
+										Recuperados
+									</th>
+									<th scope="col" class="sort" data-sort="positivo">
+										Indeterminados
+									</th>
+									<th scope="col" class="sort" data-sort="positivo">
+										IgG/IgM Positivos
+									</th>
+									<th scope="col" class="sort" data-sort="positivo">
+										Aguardando
+									</th>
+
+								</tr>
+							</thead>
+							<tbody class="list">
+								@foreach (var item in Model.Gestao)
+								{
+								<tr>
+									<td>
+										@Html.DisplayFor(modelItem => item.Estado)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.Municipio)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.Bairro)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.TotalPositivos)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.TotalNegativos)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.TotalRecuperados)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.TotalIndeterminados)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.TotalIgGIgM)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.TotalAguardando)
+									</td>
+
+								</tr>
+								}
+							</tbody>
+							<thead class="thead-light">
+								<tr>
+									<td>
+										TOTAIS
+									</td>
+									<td>
+									</td>
+									<td>
+									</td>
+									<td>
+										@Model.TotalGestaoPositivos
+									</td>
+									<td>
+										@Model.TotalGestaoNegativos
+									</td>
+									<td>
+										@Model.TotalGestaoRecuperados
+									</td>
+									<td>
+										@Model.TotalGestaoIndeterminados
+									</td>
+									<td>
+										@Model.TotalGestaoIgGIgM
+									</td>
+									<td>
+										@Model.TotalGestaoAguardando
+									</td>
+								</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+
+				<h3 class="card-title text-muted mb-0">Testes Notificados da População </h3>
+				<h4 class="card-title text-muted mb-0">Total de Testes: @Model.TotalPopulacao </h4>
+
+				<div class="card-body ">
+					<div class="table-responsive">
+						<table class="table align-items-center table-flush">
+							<thead class="thead-light">
+								<tr>
+									<th scope="col" class="sort" data-sort="estado">
+										Estado
+									</th>
+									<th scope="col" class="sort" data-sort="minicipio">
+										Município
+									</th>
+									<th scope="col" class="sort" data-sort="bairro">
+										Bairro
+									</th>
+									<th scope="col" class="sort" data-sort="positivo">
+										Positivos
+									</th>
+									<th scope="col" class="sort" data-sort="positivo">
+										Negativos
+									</th>
+									<th scope="col" class="sort" data-sort="positivo">
+										Recuperados
+									</th>
+									<th scope="col" class="sort" data-sort="positivo">
+										Indeterminados
+									</th>
+									<th scope="col" class="sort" data-sort="positivo">
+										IgG/IgM Positivos
+									</th>
+									<th scope="col" class="sort" data-sort="positivo">
+										Aguardando
+									</th>
+								</tr>
+							</thead>
+							<tbody class="list">
+								@foreach (var item in Model.Populacao)
+								{
+								<tr>
+									<td>
+										@Html.DisplayFor(modelItem => item.Estado)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.Municipio)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.Bairro)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.TotalPositivos)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.TotalNegativos)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.TotalRecuperados)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.TotalIndeterminados)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.TotalIgGIgM)
+									</td>
+									<td>
+										@Html.DisplayFor(modelItem => item.TotalAguardando)
+									</td>
+								</tr>
+								}
+							</tbody>
+							<thead class="thead-light">
+								<tr>
+									<td>
+										TOTAIS
+									</td>
+									<td>
+									</td>
+									<td>
+									</td>
+									<td>
+										@Model.TotalPopulacaoPositivos
+									</td>
+									<td>
+										@Model.TotalPopulacaoNegativos
+									</td>
+									<td>
+										@Model.TotalPopulacaoRecuperados
+									</td>
+									<td>
+										@Model.TotalPopulacaoIndeterminados
+									</td>
+									<td>
+										@Model.TotalPopulacaoIgGIGM
+									</td>
+									<td>
+										@Model.TotalPopulacaoAguardando
+									</td>
+								</tr>
+							</thead>
+						</table>
+					</div>
+				</div>
+			</div>
+        </div>
+    </div>
+</div>

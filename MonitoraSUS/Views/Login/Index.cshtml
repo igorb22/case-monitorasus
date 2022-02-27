@@ -1,0 +1,213 @@
+﻿@model Model.ViewModel.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<!-- Login -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-xl-10 col-lg-12 col-md-9">
+            <div class="card o-hidden border-0 shadow-lg my-5">
+                <div class="card-body p-0">
+                    <!-- Nested Row within Card Body -->
+                    <div class="row">
+                        <div class="col-lg-6 d-none d-lg-block banner-left">
+                            <div class="row row-info"></div>
+                            <div class="row row-info-white">
+                                <div class="col-4 text-center"> 
+                                    <img src="assets/img/logo-ufs.png" height="60" widht="100"/>
+                                </div>
+                                <div class="col-6 text-center"> 
+                                    <img src="assets/img/logo-knuth.png" style="width: 270px !important;" height="52" widht="330"/>
+                                </div>
+                            </div>
+                            <div class="row row-info" style="margin-top: 98px;">
+                                <div class="col-6"> 
+                                    <a href="https://app.powerbi.com/view?r=eyJrIjoiYmRkOTVjZDQtZGY4NS00ZDk1LWIwYTAtYzFhMmZkYWRjY2JjIiwidCI6IjhlNTRmODJjLTBmOWQtNGE2Ny1iNTZlLTk5M2I3Y2ExOWVmMiJ9" class="btn btn-block card-button-map" target="_blank">
+                                        <i class="fas fa-globe-americas fa-2x"></i><br> Mapa de <br> Casos
+                                    </a>
+                                </div>
+                                <div class="col-6"> 
+                                    <a href="https://docs.google.com/presentation/d/e/2PACX-1vSx5d0KFe02uaGkCQ9y8VqnBXyPl8f4tD6lW3JCSSn0-axJbEt9aAepIiuvnyV3J5zApC4mNtEEtTeq/pub?start=true&loop=false&delayms=30000" class="btn btn-block card-button-docs" target="_blank">
+                                        <i class="fas fa-book fa-2x"></i> <br>Manual do <br> Sistema
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="p-5">
+                                <div class="text-center">
+                                    <img src="assets/img/logo-sus.png" style="margin-bottom: 10px;" height="80" widht="80"/>
+                                    <h1 class="h4 text-gray-900 mb-2 title-app">MonitoraSUS</h1>
+                                </div>
+                                <hr>
+                                <form class="user" asp-action="SignIn" asp-controller="Login" autocomplete="off">
+                                    <div class="form-group">
+                                        <input type="text" asp-for="Cpf" required class="form-control form-control-user cpf" oninput="validaCpf()" name="cpf" id="cpf" value="" placeholder="CPF">
+                                        <span id="spanInvalidCpf" hidden class="text-danger text-center" style="padding: 10px">CPF Invalido!!</span>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="password" asp-for="Senha" required class="form-control form-control-user" name="senha" id="senha" placeholder="Senha">
+                                    </div>
+                                    <hr>
+                                    <!-- Divs Eventos -->
+                                    <!-- ERROS -->
+                                    <div hidden id="divMsg"></div>
+                                    <!-- Fim Divs Eventos -->
+                                    <button type="submit" class="btn btn-primary btn-user btn-block">
+                                        Entrar
+                                    </button>
+                                    <div class="form-group" style="margin-top: 10px; text-align: center">
+                                        <a href="#exampleModalCenter" data-toggle="modal" data-target="#modalRecSenha">Esqueceu sua senha?</a>
+                                    </div>
+                                    <hr>
+                                </form>
+                                <div class="text-center" style="margin-bottom: 10px; color:#000;">
+                                   Ainda não possui cadastro?
+                                </div>
+                                <div class="row">
+                                    <div class="col-6"> 
+                                        <a href="@Url.Action("Create", "AgenteSecretario", new { userType = 1 })" class="btn btn-block card-button-primary" >
+                                            <i class="fa fa-user fa-2x"></i><br> Gestor de <br> Saúde
+                                        </a>
+                                    </div>
+                                    <div class="col-6"> 
+                                        <a href="@Url.Action("Create", "AgenteSecretario")" class="btn btn-block card-button-primary">
+                                            <i class="fa fa-user-md fa-2x"></i> <br>Notificador <br>de Exames
+                                        </a>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="text-center span-resultados">
+                                    <a class="" href="#">Resultados de Exames</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Login -->
+<!-- MODAL -->
+<div class="modal fade" id="modalRecSenha" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Recuperação de senha</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="EmitirToken" asp-controller="Login" autocomplete="off">
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="recipient-name" class="col-form-label">Insira o seu CPF:</label>
+                        <input type="text" asp-for="Cpf" required class="form-control form-control-user cpf" oninput="validaCpf()" name="cpf" id="cpf" value="" placeholder="CPF">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Solicitar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Scripts -->
+    <script src="~/assets/js/plugins/jquery-3.4.1/jquery-3.4.1.min.js"></script>
+    <script src="~/assets/js/plugins/jquery-mask/dist/jquery.mask.min.js"></script>
+    <script src="~/assets/js/login.js"></script>
+    <script src="~/assets/js/custom.js"></script>
+
+    <script>
+        let div = document.getElementById("divMsg");
+
+        /* DIVS DE ERRO */
+        if (window.location.href.includes("msg=erro")) {
+            div.className = "alert alert-danger text-center";
+            div.hidden = false;
+            div.textContent = "Credenciais Incorretas!";
+        }
+        if (window.location.href.includes("msg=insertFail")) {
+            div.className = "alert alert-danger text-center";
+            div.hidden = false;
+            div.textContent = "Falha ao gerar solitação.";
+        }
+        if (window.location.href.includes("msg=invalidUser")) {
+            div.className = "alert alert-danger text-center";
+            div.hidden = false;
+            div.textContent = "CPF Invalido!";
+        }
+        if (window.location.href.includes("msg=invalidToken")) {
+            div.className = "alert alert-danger text-center";
+            div.hidden = false;
+            div.textContent = "Token Invalido!";
+        }
+        if (window.location.href.includes("msg=errorChange")) {
+            div.className = "alert alert-danger text-center";
+            div.hidden = false;
+            div.textContent = "Erro ao trocar senha, por favor entre em contato.";
+        }
+        if (window.location.href.includes("msg=errorCad")) {
+            div.className = "alert alert-danger text-center";
+            div.hidden = false;
+            div.textContent = "Falha ao realizar cadastro, por favor entre em contato.";
+        }
+
+
+        /* DIVS DE ALERTA */
+        if (window.location.href.includes("msg=hasToken")) {
+            div.className = "alert alert-warning text-center";
+            div.hidden = false;
+            div.textContent = "Usuario já possui uma solicitação de alteração em aberto, verifique o e-mail.";
+        }
+
+
+        /* DIVS DE SUCESSO */
+        if (window.location.href.includes("msg=successSend")) {
+            div.className = "alert alert-success text-center";
+            div.hidden = false;
+            div.textContent = "Email enviado com sucesso!!";
+        }
+        if (window.location.href.includes("msg=sucessChange")) {
+            div.className = "alert alert-success text-center";
+            div.hidden = false;
+            div.textContent = "Senha alterada com sucesso!!";
+        }
+        if (window.location.href.includes("msg=successCad")) {
+            div.className = "alert alert-success text-center";
+            div.hidden = false;
+            div.textContent = "Cadastro realizado com sucesso, aguarde email de confirmação!";
+        }
+    </script>
+
+    <script>
+        function validaCpf() {
+            let cpf = document.getElementById('cpf')
+            let span = document.getElementById('spanInvalidCpf')
+
+            let url = "Login/ValidaCpf";
+
+            $.post(url, { cpf: cpf.value }, function (data) {
+                if (!data) {
+                    cpf.className = "form-control form-control-user border-danger cpf";
+                    cpf.style = "border-width: 2px;";
+                    span.hidden = false;
+                } else {
+                    cpf.className = "form-control form-control-user cpf";
+                    cpf.style = "";
+                    span.hidden = true;
+                }
+            })
+        }
+    </script>
+
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+}
